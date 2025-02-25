@@ -119,7 +119,7 @@ if (defined $CMDOPTION)
 
 sub SnapShotFunc
 {
-	print "Backing up java files: ";
+	print "Backing up program files: ";
 	if (-f "$BACKUPDIR/snapshot.tgz")
 	{
 		unlink("$BACKUPDIR/snapshot.tgz");
