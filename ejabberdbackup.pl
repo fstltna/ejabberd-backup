@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 # Set these for your situation
-my $MTDIR = "/var/www/html";
+my $MTDIR = "/opt/ejabberd*";
 my $BACKUPDIR = "/root/backups";
 my $TARCMD = "/bin/tar czf";
 my $SQLDUMPCMD = "/usr/bin/mysqldump";
@@ -11,7 +11,7 @@ my $LATESTFILE = "$BACKUPDIR/ejabberd.sql-1";
 my $DOSNAPSHOT = 0;
 my $MYSQLUSER = "";
 my $MYSQLPSWD = "";
-my $MYSQLDBNAME = "mediawiki";
+my $MYSQLDBNAME = "ejabberd";
 my $FILEEDITOR = $ENV{EDITOR};
 
 if ($FILEEDITOR eq "")
@@ -21,13 +21,13 @@ if ($FILEEDITOR eq "")
 
 my $templatefile = <<'END_TEMPLATE';
 # Put mysql user here
-mediawiki
+ejabberd
 # Put mysql password here
 changeme
 # Put database name here
-mediawiki
-# Website folder
-/var/www/html
+ejabberd
+# eJabber folder
+/opt/ejabberd*
 END_TEMPLATE
 
 
@@ -78,17 +78,17 @@ sub ReadPrefs
 	close($fh);
 	if ($MYSQLUSER eq "")
 	{
-		print "Database username is empty - check the config file with \"wikibackup -prefs\"\n";
+		print "Database username is empty - check the config file with \"ejabberdbackup -prefs\"\n";
 		exit;
 	}
 	if ($MYSQLPSWD eq "")
 	{
-		print "Database password is empty - check the config file with \"wikibackup -prefs\"\n";
+		print "Database password is empty - check the config file with \"ejabberdbackup -prefs\"\n";
 		exit;
 	}
 	if ($MYSQLDBNAME eq "")
 	{
-		print "Database name is empty - check the config file with \"wikibackup -prefs\"\n";
+		print "Database name is empty - check the config file with \"ejabberdbackup -prefs\"\n";
 		exit;
 	}
 	# print "User = $MYSQLUSER, PSWD = $MYSQLPSWD\n";
@@ -98,7 +98,7 @@ sub DumpMysql
 {
 	my $DUMPFILE = $_[0];
 
-	print "Backing up MYSQL data: ";
+	print "Backing up MySQL data: ";
 	if (-f "$DUMPFILE")
 	{
 		unlink("$DUMPFILE");
@@ -125,7 +125,7 @@ sub SnapShotFunc
 		unlink("$BACKUPDIR/snapshot.tgz");
 	}
 	system("$TARCMD $BACKUPDIR/snapshot.tgz $MTDIR > /dev/null 2>\&1");
-	print "\nBackup Completed.\nBacking up MYSQL data: ";
+	print "\nBackup Completed.\nBacking up MySQL data: ";
 	if (-f "$BACKUPDIR/snapshot.sql")
 	{
 		unlink("$BACKUPDIR/snapshot.sql");
@@ -144,7 +144,7 @@ if ((defined $CMDOPTION) && ($CMDOPTION eq "-snapshot"))
 	$DOSNAPSHOT = -1;
 }
 
-print "WikiBackup.pl version $VERSION\n";
+print "ejabberd-backup.pl version $VERSION\n";
 if ($DOSNAPSHOT == -1)
 {
 	print "Running Manual Snapshot\n";
@@ -180,24 +180,24 @@ if ($DOSNAPSHOT == -1)
 
 print "Moving existing backups: ";
 
-if (-f "$BACKUPDIR/wikibackup-5.tgz")
+if (-f "$BACKUPDIR/ejabberdbackup-5.tgz")
 {
-	unlink("$BACKUPDIR/wikibackup-5.tgz") or warn "Could not unlink $BACKUPDIR/wikibackup-5.tgz: $!";
+	unlink("$BACKUPDIR/ejabberdbackup-5.tgz") or warn "Could not unlink $BACKUPDIR/ejabberdbackup-5.tgz: $!";
 }
 
 my $FileRevision = 4;
 while ($FileRevision > 0)
 {
-	if (-f "$BACKUPDIR/wikibackup-$FileRevision.tgz")
+	if (-f "$BACKUPDIR/ejabberdbackup-$FileRevision.tgz")
 	{
 		my $NewVersion = $FileRevision + 1;
-		rename("$BACKUPDIR/wikibackup-$FileRevision.tgz", "$BACKUPDIR/wikibackup-$NewVersion.tgz");
+		rename("$BACKUPDIR/ejabberdbackup-$FileRevision.tgz", "$BACKUPDIR/ejabberdbackup-$NewVersion.tgz");
 	}
 	$FileRevision -= 1;
 }
 
 print "Done\nCreating New Backup: ";
-system("$TARCMD $BACKUPDIR/wikibackup-1.tgz $MTDIR");
+system("$TARCMD $BACKUPDIR/ejabberdbackup-1.tgz $MTDIR");
 print "Done\nMoving Existing MySQL data: ";
 if (-f "$BACKUPDIR/ejabberd.sql-5")
 {
